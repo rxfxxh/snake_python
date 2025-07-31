@@ -92,13 +92,13 @@ def jogo():
             if evento.type == pygame.QUIT:
                 jogo_acabou = True
             if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_LEFT and direcao != "DIREITA":
+                if evento.key == pygame.K_LEFT and direcao != "DIREITA" or (evento.key == pygame.K_a and direcao != "DIREITA"):
                     direcao = "ESQUERDA"
-                elif evento.key == pygame.K_RIGHT and direcao != "ESQUERDA":
+                elif evento.key == pygame.K_RIGHT and direcao != "ESQUERDA" or (evento.key == pygame.K_d and direcao != "ESQUERDA"):
                     direcao = "DIREITA"
-                elif evento.key == pygame.K_UP and direcao != "BAIXO":
+                elif evento.key == pygame.K_UP and direcao != "BAIXO" or (evento.key == pygame.K_w and direcao != "BAIXO"):
                     direcao = "CIMA"
-                elif evento.key == pygame.K_DOWN and direcao != "CIMA":
+                elif evento.key == pygame.K_DOWN and direcao != "CIMA" or (evento.key == pygame.K_s and direcao != "CIMA"):
                     direcao = "BAIXO"
 
         cobra = mover_cobra(cobra, direcao, comida) # Passa a comida para a função de movimento
