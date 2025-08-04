@@ -1,6 +1,7 @@
 import pygame
 import random
 import os #importar para caminhos de arquivo
+from time import sleep as wait
 
 # Inicializa o Pygame
 pygame.init()
@@ -8,18 +9,25 @@ pygame.init()
 # Configurações da tela
 LARGURA_TELA = 800
 ALTURA_TELA = 800
-TAMANHO_BLOCO = 40 # Tamanho de cada segmento da cobra e da comida
+TAMANHO_BLOCO = 50 # Tamanho de cada segmento da cobra e da comida
 FPS = 10 # Velocidade do jogo (frames por segundo)
 
 # Cores
 PRETO = (0, 0, 0)
 BRANCO = (255, 255, 255)
 
+# Sons
+
+som_comendo = pygame.mixer.Sound('./sounds/eating.wav')
+som_gameover = pygame.mixer.Sound('./sounds/gameover.wav')
+som_sucesso = pygame.mixer.Sound('./sounds/sucess.wav')
+
 # Cria a tela
 tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
 pygame.display.set_caption("Jogo da Cobra")
 
 relogio = pygame.time.Clock()
+
 
 
 # Carregamento do estilo da Cobra 
@@ -75,61 +83,99 @@ def desenhar_comida(comida):
     tela.blit(imagem_maca, (comida[0], comida[1]))
 
 def exibir_pontuacao(pontuacao):
-    fonte = pygame.font.Font(None, 25) # Fonte padrão, tamanho 25
+    fonte = pygame.font.Font(None, 30) # Fonte padrão, tamanho 30
     texto_pontuacao = fonte.render(f"Pontuação: {pontuacao}", True, BRANCO)
     tela.blit(texto_pontuacao, (5, 5))
 
-def jogo():
-    # Carrega a imagem da cobra no início do jogo
-    cobra = [[LARGURA_TELA / 2, ALTURA_TELA / 2]] # Posição inicial da cobra (cabeça)
-    direcao = "DIREITA" # Direção inicial da cobra
-    comida = gerar_comida() # Gera a primeira comida
-    pontuacao = 0
-    jogo_acabou = False
+def desenhar_menu():
+    tela.fill((0, 0, 0))
+    font = pygame.font.SysFont('arial', 40)
+    title = font.render('Jogo da Cobrinha', True, (255, 255, 255))
+    start_button = font.render('Pressione espaço para começar', True, (255, 255, 255))
+    tela.blit(title, (LARGURA_TELA/2 - title.get_width()/2, ALTURA_TELA/2 - title.get_height()/2))
+    tela.blit(start_button, (LARGURA_TELA/2 - start_button.get_width()/2, ALTURA_TELA/2 +300 + start_button.get_height()/2))
+    pygame.display.update()
 
-    while not jogo_acabou:
+
+def jogo():
+    # O estado inicial do jogo é o menu
+    game_state = "start_menu"
+
+    # Essas variáveis precisam ser criadas fora do loop para não serem resetadas
+    # a cada ciclo. Elas serão inicializadas de fato quando o jogo começar.
+    cobra = [[LARGURA_TELA / 2, ALTURA_TELA / 2]]
+    direcao = "DIREITA"
+    comida = gerar_comida()
+    pontuacao = 0
+
+    while True:
+        # AQUI É O LOOP PRINCIPAL. Ele roda o tempo todo.
+        # Ele verifica todos os eventos (como cliques e teclas)
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                jogo_acabou = True
-            if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_LEFT and direcao != "DIREITA" or (evento.key == pygame.K_a and direcao != "DIREITA"):
-                    direcao = "ESQUERDA"
-                elif evento.key == pygame.K_RIGHT and direcao != "ESQUERDA" or (evento.key == pygame.K_d and direcao != "ESQUERDA"):
+                pygame.quit()
+                quit()
+            
+            # Se o jogo estiver no menu e o usuário apertar a tecla Espaço...
+            if game_state == "start_menu":
+                if evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
+                    som_sucesso.play()
+                    game_state = "game"
+                    # Resetamos as variáveis do jogo para começar de novo
+                    cobra = [[LARGURA_TELA / 2, ALTURA_TELA / 2]]
                     direcao = "DIREITA"
-                elif evento.key == pygame.K_UP and direcao != "BAIXO" or (evento.key == pygame.K_w and direcao != "BAIXO"):
-                    direcao = "CIMA"
-                elif evento.key == pygame.K_DOWN and direcao != "CIMA" or (evento.key == pygame.K_s and direcao != "CIMA"):
-                    direcao = "BAIXO"
+                    comida = gerar_comida()
+                    pontuacao = 0
+            
+            # Se o jogo estiver em andamento, verifica os comandos da cobra
+            elif game_state == "game":
+                if evento.type == pygame.KEYDOWN:
+                    if (evento.key == pygame.K_LEFT or evento.key == pygame.K_a) and direcao != "DIREITA":
+                        direcao = "ESQUERDA"
+                    elif (evento.key == pygame.K_RIGHT or evento.key == pygame.K_d) and direcao != "ESQUERDA":
+                        direcao = "DIREITA"
+                    elif (evento.key == pygame.K_UP or evento.key == pygame.K_w) and direcao != "BAIXO":
+                        direcao = "CIMA"
+                    elif (evento.key == pygame.K_DOWN or evento.key == pygame.K_s) and direcao != "CIMA":
+                        direcao = "BAIXO"
 
-        cobra = mover_cobra(cobra, direcao, comida) # Passa a comida para a função de movimento
+        # desenha e atualiza a tela, dependendo do estado atual
+        if game_state == "start_menu":
+            desenhar_menu()
+        
+        elif game_state == "game":
+            # Toda a lógica do jogo ta aqui
+            cobra = mover_cobra(cobra, direcao, comida)
 
+            # Colisão com as bordas
+            if cobra[0][0] >= LARGURA_TELA or cobra[0][0] < 0 or \
+            cobra[0][1] >= ALTURA_TELA or cobra[0][1] < 0:
+                som_gameover.play()
+                wait(2)
+                pygame.quit()
+                exit()
 
-        # Colisão com as bordas da tela
-        if cobra[0][0] >= LARGURA_TELA or cobra[0][0] < 0 or \
-           cobra[0][1] >= ALTURA_TELA or cobra[0][1] < 0:
-            jogo_acabou = True
+            # Colisão com o próprio corpo
+            for segmento in cobra[1:]:
+                if cobra[0][0] == segmento[0] and cobra[0][1] == segmento[1]:
+                    som_gameover.play()
+                    wait(2)
+                    pygame.quit()
+                    exit()
 
-        # Colisão com o próprio corpo
-        # Percorre todos os segmentos da cobra, exceto a cabeça (o primeiro elemento)
-        for segmento in cobra[1:]: 
-            if cobra[0][0] == segmento[0] and cobra[0][1] == segmento[1]:
-                jogo_acabou = True
+            # Colisão com a comida
+            if cobra[0][0] == comida[0] and cobra[0][1] == comida[1]:
+                som_comendo.play()
+                comida = gerar_comida()
+                pontuacao += 1
 
-        # Colisão com a comida
-        if cobra[0][0] == comida[0] and cobra[0][1] == comida[1]:
-            comida = gerar_comida() # Gera nova comida
-            pontuacao += 1 # Aumenta a pontuação
-
-        tela.fill(PRETO) # Limpa a tela com o fundo preto
-        desenhar_cobra(cobra) # Desenha a cobra atualizada
-        desenhar_comida(comida) # Desenha a comida
-        exibir_pontuacao(pontuacao) # Exibe a pontuação
-
-        pygame.display.flip() # Atualiza toda a tela para mostrar o que foi desenhado
-        relogio.tick(FPS) # Controla a velocidade do jogo
-
-    pygame.quit() # Desinicializa todos os módulos Pygame
-    quit() # Sai do Python
+            # Desenha e atualiza a tela do jogo
+            tela.fill(PRETO)
+            desenhar_cobra(cobra)
+            desenhar_comida(comida)
+            exibir_pontuacao(pontuacao)
+            pygame.display.flip()
+            relogio.tick(FPS)
 
 # Inicia o jogo
 if __name__ == "__main__":
