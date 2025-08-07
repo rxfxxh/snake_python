@@ -32,6 +32,7 @@ img4 = pygame.image.load('./src/img/skin4.png').convert_alpha()
 img_apple = pygame.image.load('./src/img/apple.png').convert_alpha()
 
 # Classe que representa a cobra
+# VITOR ---------------------------------------------
 class Cobra:
     def __init__(self, skin):
         self.corpo = [[LARGURA_TELA // 2, ALTURA_TELA // 2]]  # Começo da cobra no centro da tela
@@ -61,6 +62,8 @@ class Cobra:
         for segmento in self.corpo:
             tela.blit(self.imagem, (segmento[0], segmento[1]))
 
+        # JÚLIO ---------------------------------------------
+    
     def colidiu_com_borda(self):
         # Verifica se a cabeça da cobra bateu na borda da tela
         x, y = self.corpo[0]
@@ -81,6 +84,8 @@ class Cobra:
         self.__init__(skin)
 
 # Classe que representa a comida (maçã)
+
+# LEONARDO ---------------------------------------------
 class Comida:
     def __init__(self):
         self.imagem = pygame.transform.scale(img_apple, (TAMANHO_BLOCO, TAMANHO_BLOCO))  # Definindo o tamanho da imagem da comida
@@ -192,4 +197,5 @@ class JogoCobrinha:
 if __name__ == "__main__":
     jogo = JogoCobrinha()
     jogo.loop()
+
 
