@@ -18,15 +18,15 @@ PRETO = (0, 0, 0)     # Cor preta
 BRANCO = (255, 255, 255)  # Cor branca
 
 # Sons
-som_comendo = pygame.mixer.Sound('./src/sounds/eating.wav')  # Som quando a cobra come a comida
-som_gameover = pygame.mixer.Sound('./src/sounds/gameover.wav')  # Som de game over
-som_sucesso = pygame.mixer.Sound('./src/sounds/sucess.wav')  # Som de sucesso ao iniciar o jogo
+som_comendo = pygame.mixer.Sound('./sounds/eating.wav')  # Som quando a cobra come a comida
+som_gameover = pygame.mixer.Sound('./sounds/gameover.wav')  # Som de game over
+som_sucesso = pygame.mixer.Sound('./sounds/sucess.wav')  # Som de sucesso ao iniciar o jogo
 
 # Carregando as imagens das skins e da maçã
-img1 = pygame.image.load('./src/img/skin1.png').convert_alpha()
-img2 = pygame.image.load('./src/img/skin2.png').convert_alpha()
-img3 = pygame.image.load('./src/img/skin3.png').convert_alpha()
-img4 = pygame.image.load('./src/img/skin4.png').convert_alpha()
+img1 = pygame.image.load('./img/skin1.png').convert_alpha()
+img2 = pygame.image.load('./img/skin2.png').convert_alpha()
+img3 = pygame.image.load('./img/skin3.png').convert_alpha()
+img4 = pygame.image.load('./img/skin4.png').convert_alpha()
 
 
 # Tela de exibição

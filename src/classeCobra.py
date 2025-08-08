@@ -12,6 +12,13 @@ FPS = 8             # Taxa de quadros por segundo (velocidade do jogo)
 PRETO = (0, 0, 0)     # Cor preta
 BRANCO = (255, 255, 255)  # Cor branca
 
+# Inicialização da biblioteca Pygame
+pygame.init()
+# Tela de exibição
+tela = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))  # Criando a tela
+pygame.display.set_caption("Jogo da Cobrinha")  # Título da janela
+
+
 # Classe que representa a cobra
 # VITOR ---------------------------------------------
 class Cobra:
